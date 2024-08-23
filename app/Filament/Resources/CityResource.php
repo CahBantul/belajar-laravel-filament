@@ -25,11 +25,14 @@ class CityResource extends Resource
         return $form
             ->schema([
                 Forms\Components\TextInput::make('name')
-                    ->required()
-                    ->maxLength(255),
-                Forms\Components\TextInput::make('state_id')
-                    ->required()
-                    ->numeric(),
+                ->label('City Name')
+                ->required()
+                ->maxLength(255),
+            Forms\Components\Select::make('state_id')
+                ->relationship('state', 'name')
+                ->searchable()
+                ->preload()
+                ->required(),
             ]);
     }
 
@@ -39,8 +42,7 @@ class CityResource extends Resource
             ->columns([
                 Tables\Columns\TextColumn::make('name')
                     ->searchable(),
-                Tables\Columns\TextColumn::make('state_id')
-                    ->numeric()
+                Tables\Columns\TextColumn::make('state.name')
                     ->sortable(),
                 Tables\Columns\TextColumn::make('created_at')
                     ->dateTime()
