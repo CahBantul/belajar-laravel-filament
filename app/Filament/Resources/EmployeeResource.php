@@ -4,9 +4,17 @@ namespace App\Filament\Resources;
 
 use App\Filament\Resources\EmployeeResource\Pages;
 use App\Filament\Resources\EmployeeResource\RelationManagers;
+use App\Models\City;
+use App\Models\Country;
+use App\Models\Department;
 use App\Models\Employee;
+use App\Models\State;
 use Filament\Forms;
+use Filament\Forms\Components\Section;
+use Filament\Forms\Components\Select;
 use Filament\Forms\Form;
+use Filament\Forms\Get;
+use Filament\Forms\Set;
 use Filament\Resources\Resource;
 use Filament\Tables;
 use Filament\Tables\Table;
@@ -23,21 +31,57 @@ class EmployeeResource extends Resource
     {
         return $form
             ->schema([
-                Forms\Components\TextInput::make('first_name')
-                    ->required()
-                    ->maxLength(255),
-                Forms\Components\TextInput::make('last_name')
-                    ->required()
-                    ->maxLength(255),
-                Forms\Components\TextInput::make('middle_name')
-                    ->maxLength(255),
-                Forms\Components\TextInput::make('address')
-                    ->required()
-                    ->maxLength(255),
-                Forms\Components\DatePicker::make('date_hired')
-                    ->required(),
-                Forms\Components\DatePicker::make('date_of_birth')
-                    ->required(),
+                Section::make('Personal Information')
+                    ->schema([
+                        Forms\Components\TextInput::make('first_name')
+                            ->required()
+                            ->maxLength(255),
+                        Forms\Components\TextInput::make('middle_name')
+                            ->maxLength(255),
+                        Forms\Components\TextInput::make('last_name')
+                            ->required()
+                            ->maxLength(255),
+                        Forms\Components\DatePicker::make('date_of_birth')
+                            ->required(),
+                    ])
+                    ->columns(3),
+                Section::make('Employee Information')
+                    ->schema([
+                        Select::make('country_id')
+                            ->options(Country::all()->pluck('name', 'id'))
+                            ->label('Country Name')
+                            ->live()
+                            ->afterStateUpdated(function (Set $set) {
+                                $set('state_id', null);
+                                $set('city_id', null);
+                            })
+                            ->searchable(),
+                        Select::make('state_id')
+                            ->options(fn(Get $get) => State::query()->where('country_id', $get('country_id'))->pluck('name', 'id'))
+                            ->label('State Name')
+                            ->live()
+                            ->afterStateUpdated(function (Set $set) {
+                                $set('city_id', null);
+                            })
+                            ->searchable(),
+                        Select::make('city_id')
+                            ->options(fn(Get $get) => City::query()->where('state_id', $get('state_id'))->pluck('name', 'id'))
+                            ->label('City Name')
+                            ->searchable(),
+                        Forms\Components\TextInput::make('address')
+                            ->required()
+                            ->maxLength(255)
+                            ->columnSpanFull(),
+                        Forms\Components\TextInput::make('zip_code')
+                            ->required()
+                            ->numeric(),
+                        Select::make('department_id')
+                            ->options(Department::all()->pluck('name', 'id'))
+                            ->label('Department')
+                            ->searchable(),
+                        Forms\Components\DatePicker::make('date_hired')
+                            ->required(),
+                    ])->columns(3),
             ]);
     }
 
