@@ -94,14 +94,19 @@ class EmployeeResource extends Resource
                 Tables\Columns\TextColumn::make('last_name')
                     ->searchable(),
                 Tables\Columns\TextColumn::make('middle_name')
+                ->toggleable(isToggledHiddenByDefault: true)
                     ->searchable(),
                 Tables\Columns\TextColumn::make('address')
+                ->toggleable(isToggledHiddenByDefault: true)
                     ->searchable(),
+                Tables\Columns\TextColumn::make('department.name')
+                    ->sortable(),
                 Tables\Columns\TextColumn::make('date_hired')
                     ->date()
                     ->sortable(),
                 Tables\Columns\TextColumn::make('date_of_birth')
                     ->date()
+                    ->toggleable(isToggledHiddenByDefault: true)
                     ->sortable(),
                 Tables\Columns\TextColumn::make('created_at')
                     ->dateTime()
@@ -138,8 +143,8 @@ class EmployeeResource extends Resource
         return [
             'index' => Pages\ListEmployees::route('/'),
             'create' => Pages\CreateEmployee::route('/create'),
-            'view' => Pages\ViewEmployee::route('/{record}'),
-            'edit' => Pages\EditEmployee::route('/{record}/edit'),
+            // 'view' => Pages\ViewEmployee::route('/{record}'),
+            // 'edit' => Pages\EditEmployee::route('/{record}/edit'),
         ];
     }
 }
