@@ -30,6 +30,7 @@ class DepartmentResource extends Resource
             ->schema([
                 Forms\Components\TextInput::make('name')
                     ->required()
+                    ->unique(ignoreRecord: true)
                     ->maxLength(255),
             ]);
     }

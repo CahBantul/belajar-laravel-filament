@@ -7,6 +7,7 @@ use App\Filament\Resources\StateResource\RelationManagers;
 use App\Models\State;
 use Filament\Forms;
 use Filament\Forms\Form;
+use Filament\Forms\Get;
 use Filament\Resources\Resource;
 use Filament\Tables;
 use Filament\Tables\Table;
@@ -26,6 +27,11 @@ class StateResource extends Resource
             ->schema([
                 Forms\Components\TextInput::make('name')
                     ->label('State Name')
+                    ->rule(function (Get $get, $record){
+                        $recordId = $record?->id;
+                        $countryId = $get('country_id');
+                        return "unique:states,name, $recordId ,id,country_id, $countryId";
+                    })
                     ->required()
                     ->maxLength(255),
                 Forms\Components\Select::make('country_id')
