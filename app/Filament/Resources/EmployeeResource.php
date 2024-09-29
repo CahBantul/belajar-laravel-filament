@@ -9,7 +9,9 @@ use App\Models\Country;
 use App\Models\Department;
 use App\Models\Employee;
 use App\Models\State;
+use Carbon\Carbon;
 use Filament\Forms;
+use Filament\Forms\Components\DatePicker;
 use Filament\Forms\Components\Section;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Form;
@@ -17,6 +19,9 @@ use Filament\Forms\Get;
 use Filament\Forms\Set;
 use Filament\Resources\Resource;
 use Filament\Tables;
+use Filament\Tables\Filters\Filter;
+use Filament\Tables\Filters\Indicator;
+use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
@@ -94,10 +99,10 @@ class EmployeeResource extends Resource
                 Tables\Columns\TextColumn::make('last_name')
                     ->searchable(),
                 Tables\Columns\TextColumn::make('middle_name')
-                ->toggleable(isToggledHiddenByDefault: true)
+                    ->toggleable(isToggledHiddenByDefault: true)
                     ->searchable(),
                 Tables\Columns\TextColumn::make('address')
-                ->toggleable(isToggledHiddenByDefault: true)
+                    ->toggleable(isToggledHiddenByDefault: true)
                     ->searchable(),
                 Tables\Columns\TextColumn::make('department.name')
                     ->sortable(),
@@ -118,7 +123,40 @@ class EmployeeResource extends Resource
                     ->toggleable(isToggledHiddenByDefault: true),
             ])
             ->filters([
-                //
+                SelectFilter::make('department')
+                    ->label('Department')
+                    ->relationship('department', 'name'),
+                Filter::make('created_at')
+                    ->form([
+                        DatePicker::make('hired_from'),
+                        DatePicker::make('hired_until'),
+                    ])
+                    ->query(function (Builder $query, array $data): Builder {
+                        return $query
+                            ->when(
+                                $data['hired_from'],
+                                fn(Builder $query, $date): Builder => $query->whereDate('date_hired', '>=', $date),
+                            )
+                            ->when(
+                                $data['hired_until'],
+                                fn(Builder $query, $date): Builder => $query->whereDate('date_hired', '<=', $date),
+                            );
+                    })
+                    ->indicateUsing(function (array $data): array {
+                        $indicators = [];
+
+                        if ($data['hired_from'] ?? null) {
+                            $indicators[] = Indicator::make('Hired from ' . Carbon::parse($data['hired_from'])->toFormattedDateString())
+                                ->removeField('hired_from');
+                        }
+
+                        if ($data['hired_until'] ?? null) {
+                            $indicators[] = Indicator::make('Hired until ' . Carbon::parse($data['hired_until'])->toFormattedDateString())
+                                ->removeField('hired_until');
+                        }
+
+                        return $indicators;
+                    }),
             ])
             ->actions([
                 Tables\Actions\ViewAction::make(),
