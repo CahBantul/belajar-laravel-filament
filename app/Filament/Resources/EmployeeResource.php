@@ -3,6 +3,7 @@
 namespace App\Filament\Resources;
 
 use App\Filament\Exports\EmployeeExporter;
+use App\Filament\Imports\EmployeeImporter;
 use App\Filament\Resources\EmployeeResource\Pages;
 use App\Filament\Resources\EmployeeResource\RelationManagers;
 use App\Models\City;
@@ -22,6 +23,7 @@ use Filament\Resources\Resource;
 use Filament\Tables;
 use Filament\Tables\Actions\ExportAction;
 use Filament\Tables\Actions\ExportBulkAction;
+use Filament\Tables\Actions\ImportAction;
 use Filament\Tables\Filters\Filter;
 use Filament\Tables\Filters\Indicator;
 use Filament\Tables\Filters\SelectFilter;
@@ -172,7 +174,8 @@ class EmployeeResource extends Resource
                 ]),
             ])
             ->headerActions([
-                ExportAction::make()->exporter(EmployeeExporter::class)
+                ExportAction::make()->exporter(EmployeeExporter::class),
+                ImportAction::make()->importer(EmployeeImporter::class)
             ]);
     }
 
