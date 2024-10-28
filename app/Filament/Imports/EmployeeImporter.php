@@ -2,7 +2,11 @@
 
 namespace App\Filament\Imports;
 
+use App\Models\City;
+use App\Models\Country;
+use App\Models\Department;
 use App\Models\Employee;
+use App\Models\State;
 use Filament\Actions\Imports\ImportColumn;
 use Filament\Actions\Imports\Importer;
 use Filament\Actions\Imports\Models\Import;
@@ -73,5 +77,18 @@ class EmployeeImporter extends Importer
         }
 
         return $body;
+    }
+
+    protected function beforeValidate(): void
+    {
+        $country_id = Country::query()->where('name', $this->data['country'])->first()?->id;
+        $this->data['country'] = $country_id;
+        $state_id = State::query()->where('name', $this->data['state'])->first()?->id;
+        $this->data['state'] = $state_id;
+        $city_id = City::query()->where('name', $this->data['city'])->first()?->id;
+        $this->data['city'] = $city_id;
+        $department_id = Department::query()->where('name', $this->data['department'])->first()?->id;
+        $this->data['department'] = $department_id;
+        info($this->data);
     }
 }
