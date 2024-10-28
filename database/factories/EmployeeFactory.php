@@ -18,6 +18,7 @@ class EmployeeFactory extends Factory
     public function definition(): array
     {
         return [
+            'employee_code' => $this->faker->unique()->numerify('EMPL####'),
             'first_name' => $this->faker->firstName,
             'last_name' => $this->faker->lastName,
             'middle_name' => $this->faker->lastName,

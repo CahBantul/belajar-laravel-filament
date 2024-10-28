@@ -20,6 +20,7 @@ class EmployeeExporter extends Exporter
         return [
             ExportColumn::make('id')
                 ->label('ID'),
+            ExportColumn::make('employee_code'),
             ExportColumn::make('first_name'),
             ExportColumn::make('last_name'),
             ExportColumn::make('middle_name'),

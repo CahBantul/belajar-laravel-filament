@@ -18,6 +18,9 @@ class EmployeeImporter extends Importer
     public static function getColumns(): array
     {
         return [
+            ImportColumn::make('employee_code')
+                ->requiredMapping()
+                ->rules(['required']),
             ImportColumn::make('first_name')
                 ->requiredMapping()
                 ->rules(['required', 'max:255']),
@@ -60,12 +63,12 @@ class EmployeeImporter extends Importer
 
     public function resolveRecord(): ?Employee
     {
-        // return Employee::firstOrNew([
-        //     // Update existing records, matching them by `$this->data['column_name']`
-        //     'email' => $this->data['email'],
-        // ]);
+        return Employee::firstOrNew([
+            // Update existing records, matching them by `$this->data['column_name']`
+            'employee_code' => $this->data['employee_code'],
+        ]);
 
-        return new Employee();
+        // return new Employee();
     }
 
     public static function getCompletedNotificationBody(Import $import): string
@@ -89,6 +92,5 @@ class EmployeeImporter extends Importer
         $this->data['city'] = $city_id;
         $department_id = Department::query()->where('name', $this->data['department'])->first()?->id;
         $this->data['department'] = $department_id;
-        info($this->data);
     }
 }
